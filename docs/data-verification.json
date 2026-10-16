@@ -1,0 +1,25 @@
+{
+  "purpose": "Real-data loading/backpropagation smoke check, not completed training",
+  "datasets": {
+    "plantvillage": {
+      "batch": [
+        2,
+        3,
+        384,
+        384
+      ],
+      "classes": 38,
+      "decode_and_backward": "passed"
+    },
+    "plantdoc": {
+      "batch": [
+        2,
+        3,
+        384,
+        384
+      ],
+      "classes": 28,
+      "decode_and_backward": "passed"
+    }
+  }
+}

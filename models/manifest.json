@@ -1,0 +1,32 @@
+{
+  "status": "ImageNet initialization only; no plant-stress training",
+  "models": {
+    "efficientnet_b0": {
+      "weights": "EfficientNet_B0_Weights.IMAGENET1K_V1",
+      "url": "https://download.pytorch.org/models/efficientnet_b0_rwightman-7f5810bc.pth",
+      "filename": "efficientnet_b0_rwightman-7f5810bc.pth",
+      "sha256": "7f5810bc96def8f7552d5b7e68d53c4786f81167d28291b21c0d90e1fca14934",
+      "bytes": 21444401,
+      "embedding_dim": 1280,
+      "pretraining": "ImageNet-1K"
+    },
+    "convnext_tiny": {
+      "weights": "ConvNeXt_Tiny_Weights.IMAGENET1K_V1",
+      "url": "https://download.pytorch.org/models/convnext_tiny-983f1562.pth",
+      "filename": "convnext_tiny-983f1562.pth",
+      "sha256": "983f1562536e84ff750a1576fb08e54de751dbf2e17c0d8a4a13704341fdcd3d",
+      "bytes": 114419221,
+      "embedding_dim": 768,
+      "pretraining": "ImageNet-1K"
+    },
+    "mobilenet_v3_large": {
+      "weights": "MobileNet_V3_Large_Weights.IMAGENET1K_V2",
+      "url": "https://download.pytorch.org/models/mobilenet_v3_large-5c1a4163.pth",
+      "filename": "mobilenet_v3_large-5c1a4163.pth",
+      "sha256": "5c1a416349c4cf298f2a6a5e2600ed0ee55e604713578f5e74e6bc8bcaef7997",
+      "bytes": 22132113,
+      "embedding_dim": 960,
+      "pretraining": "ImageNet-1K"
+    }
+  }
+}

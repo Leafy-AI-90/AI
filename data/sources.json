@@ -1,0 +1,25 @@
+{
+  "plantvillage": {
+    "repository": "https://github.com/spMohanty/PlantVillage-Dataset",
+    "github_revision": "7f7ecc7e1eaca78107e3affe7cb5abd9427e139a",
+    "download_repository": "https://huggingface.co/datasets/mohanty/PlantVillage",
+    "revision": "9e97599868962bd0079b8db4b7f1efa9185fa1e7",
+    "url": "https://huggingface.co/datasets/mohanty/PlantVillage/resolve/9e97599868962bd0079b8db4b7f1efa9185fa1e7/data.zip",
+    "sha256": "fba30c6a7965e49be94b47a62f8aff6cfb1c35c27f475f22092b56db41745e84",
+    "bytes": 2184723441,
+    "variant": "color",
+    "license_reported_by_author_card": "CC-BY-SA-3.0",
+    "license_note": "GitHub has no standalone dataset license; retain the author card and attribution. Its loader comments that the license is assumed. Check terms before redistributing images.",
+    "citation": "Mohanty, Hughes & Salathe (2016), doi:10.3389/fpls.2016.01419"
+  },
+  "plantdoc": {
+    "repository": "https://github.com/pratikkayal/PlantDoc-Dataset",
+    "revision": "5467f6012d78d1c446145d5f582da6096f852ae8",
+    "url": "https://codeload.github.com/pratikkayal/PlantDoc-Dataset/zip/5467f6012d78d1c446145d5f582da6096f852ae8",
+    "variant": "cropped classification",
+    "license_reported_by_repository": "CC-BY-4.0",
+    "citation": "Singh et al. (2020), doi:10.1145/3371158.3371196",
+    "sha256": "94e2b99a500a63efbd48923ed48588fbb01f9b1db66a2d3b5c24eed6466da20f",
+    "bytes": 984592720
+  }
+}
