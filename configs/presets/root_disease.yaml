@@ -12,6 +12,7 @@ design:
   endpoint_day: 10
 leaf_positions: [oldest, middle, youngest]
 repeats: 3
+calibration: {solvent: acetone_80, outer_folds: 5, inner_folds: 3, max_pls_components: 12}
 spectral:
   sensor: AS7265x
   bands_nm: [410, 435, 460, 485, 510, 535, 560, 585, 610, 645, 680, 705, 730, 760, 810, 860, 900, 940]

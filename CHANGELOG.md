@@ -4,6 +4,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Added (Phase 4: chlorophyll calibration)
+- Configurable extraction solvent and plant-grouped nested CV settings for H1.
+- Lichtenthaler–Buschmann 80% acetone and 95% ethanol calculations with measured dilution, volume, path length and leaf area.
+- `analysis/h1_calibration.py` writes held-out-plant PLSR and baseline metrics, predictions, VIP scores, plots and selection counts; synthetic figures require a watermark.
+- `docs/calibration.md` and hand-calculated calibration tests.
+
 ### Added (Phase 3: feature engineering)
 - `features.py`: W970 = A970 - A940; thermal ΔT, CWSI, temperature spread; FAO-56 VPD; `positional_contrasts` for 3 or 4 positions; `baseline_change` (vs day -1) and causal `recent_slope` (last 3 measurement days)
 - `feature_table.build_features`: plant/day table from validated tables; calibration against session references, repeat and position averaging, QC exclusions left out and counted, missing positions give NaN

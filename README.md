@@ -108,6 +108,11 @@ QC flags rows and never drops them; exclusions follow `qc.exclude_flags` in pres
 Image step fits 3×3 colour correction per image from 24 patch checker and writes
 leaf mask plus background removed variant.
 
+For measured calibration plants, run the [H1 chlorophyll analysis](docs/calibration.md)
+after ingestion and feature building. It selects PLS components in inner
+plant-grouped folds and compares held-out predictions with M660 and red-edge
+baselines. No H1 biological result is reported until real measurements exist.
+
 `leafy_ai.CLASSES` keeps returning default `xcc` class list for backward compatibility.
 
 ### Use the models
