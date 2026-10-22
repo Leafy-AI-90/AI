@@ -1,0 +1,23 @@
+# Xanthomonas campestris pv. campestris (Xcc) design; current default preset.
+schema_version: 1
+preset: xcc
+description: N and Fe deficiency, Xcc black rot and N deficiency + Xcc in Choy Sum
+crop: choy_sum
+classes: [control, n_deficiency, fe_deficiency, xcc, n_deficiency_xcc]
+design:
+  plants_per_class: 24
+  cycles: 3
+  calibration_plants: 60
+  days: {first: -1, last: 14}
+  endpoint_day: 8
+leaf_positions: [oldest, youngest, lesion, off_lesion]
+repeats: 3
+spectral:
+  sensor: AS7265x
+  bands_nm: [410, 435, 460, 485, 510, 535, 560, 585, 610, 645, 680, 705, 730, 760, 810, 860, 900, 940]
+transmission:
+  leds_nm: [660, 710, 940]
+sensors: {rgb: true, spectral: true, transmission: true, thermal: false, root_images: false}
+key_confusion_pairs:
+  - [n_deficiency, xcc]
+  - [n_deficiency, fe_deficiency]

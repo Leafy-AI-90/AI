@@ -1,0 +1,16 @@
+name: Feature or analysis request
+description: New model, feature, analysis or config option
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Need
+      description: What it adds and which phase or hypothesis (H1 to H5) it supports
+    validations:
+      required: true
+  - type: textarea
+    id: leakage
+    attributes:
+      label: Leakage check
+      description: How plant grouping and fold local fitting stay intact

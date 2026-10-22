@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it as below.
+title: "Leafy AI: multimodal plant stress research code for Choy Sum"
+type: software
+authors:
+  - name: Leafy AI contributors
+repository-code: https://github.com/Leafy-AI-90/AI
+license: MIT
+version: 0.1.0
+keywords:
+  - plant phenotyping
+  - multispectral
+  - data fusion
+  - Choy Sum

@@ -1,23 +1,26 @@
 """Trainable spectral baselines and fusion components from review section 6.10."""
+
 import numpy as np
 from scipy.special import softmax
 from sklearn.base import BaseEstimator, ClassifierMixin, clone
+from sklearn.compose import ColumnTransformer
 from sklearn.cross_decomposition import PLSRegression
+from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from sklearn.compose import ColumnTransformer
-from sklearn.decomposition import PCA
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 from xgboost import XGBClassifier
+
 from .validation import grouped_folds
 
 
 class PLSDA(ClassifierMixin, BaseEstimator):
     """PLS on one-hot labels. Softmax scores are not calibrated probabilities."""
+
     def __init__(self, n_components=3):
         self.n_components = n_components
 
@@ -41,14 +44,37 @@ class PLSDA(ClassifierMixin, BaseEstimator):
 
 def spectral_model(name, seed=42):
     models = {
-        "logistic": lambda: make_pipeline(StandardScaler(), LogisticRegression(class_weight="balanced", max_iter=2000, random_state=seed)),
+        "logistic": lambda: make_pipeline(
+            StandardScaler(),
+            LogisticRegression(class_weight="balanced", max_iter=2000, random_state=seed),
+        ),
         "pls_da": lambda: PLSDA(),
-        "random_forest": lambda: RandomForestClassifier(n_estimators=200, min_samples_leaf=3, class_weight="balanced", random_state=seed, n_jobs=2),
+        "random_forest": lambda: RandomForestClassifier(
+            n_estimators=200,
+            min_samples_leaf=3,
+            class_weight="balanced",
+            random_state=seed,
+            n_jobs=2,
+        ),
         # No built-in SVC probability CV: that CV does not respect plant groups.
-        "svm": lambda: make_pipeline(StandardScaler(), SVC(class_weight="balanced", probability=False, random_state=seed)),
+        "svm": lambda: make_pipeline(
+            StandardScaler(), SVC(class_weight="balanced", probability=False, random_state=seed)
+        ),
         # No random validation split for early stopping: tune using grouped folds.
-        "mlp": lambda: make_pipeline(StandardScaler(), MLPClassifier(hidden_layer_sizes=(32,), max_iter=1000, early_stopping=False, random_state=seed)),
-        "xgboost": lambda: XGBClassifier(n_estimators=100, max_depth=3, learning_rate=0.05, tree_method="hist", n_jobs=2, random_state=seed),
+        "mlp": lambda: make_pipeline(
+            StandardScaler(),
+            MLPClassifier(
+                hidden_layer_sizes=(32,), max_iter=1000, early_stopping=False, random_state=seed
+            ),
+        ),
+        "xgboost": lambda: XGBClassifier(
+            n_estimators=100,
+            max_depth=3,
+            learning_rate=0.05,
+            tree_method="hist",
+            n_jobs=2,
+            random_state=seed,
+        ),
     }
     if name not in models:
         raise ValueError(f"Unknown spectral model: {name}")
@@ -68,10 +94,18 @@ def intermediate_fusion(embedding_dim, total_dim, pca_components=32, seed=42):
     """
     if not 0 < embedding_dim < total_dim:
         raise ValueError("Require both image and spectral columns")
-    transform = ColumnTransformer([
-        ("image", make_pipeline(StandardScaler(), PCA(n_components=pca_components, random_state=seed)), list(range(embedding_dim))),
-        ("spectral", "passthrough", list(range(embedding_dim, total_dim))),
-    ])
+    transform = ColumnTransformer(
+        [
+            (
+                "image",
+                make_pipeline(
+                    StandardScaler(), PCA(n_components=pca_components, random_state=seed)
+                ),
+                list(range(embedding_dim)),
+            ),
+            ("spectral", "passthrough", list(range(embedding_dim, total_dim))),
+        ]
+    )
     return make_pipeline(transform, spectral_model("xgboost", seed))
 
 
@@ -82,6 +116,7 @@ class GroupedLateFusion:
     Evaluate this whole object in an outer plant/cycle split, never its fit data.
     Any supervised image feature extraction must also be nested per fold.
     """
+
     def __init__(self, estimators, n_splits=3, seed=42):
         self.estimators, self.n_splits, self.seed = estimators, n_splits, seed
 
@@ -95,12 +130,12 @@ class GroupedLateFusion:
         oof = np.zeros((len(y), c * len(views)))
         splits = list(grouped_folds(y, plants, self.n_splits, self.seed))
         self.models_ = []
-        for i, (estimator, x) in enumerate(zip(self.estimators, views)):
+        for i, (estimator, x) in enumerate(zip(self.estimators, views, strict=True)):
             for train, test in splits:
                 fitted = clone(estimator).fit(x[train], y[train])
                 if not np.array_equal(fitted.classes_, self.classes_):
                     raise ValueError("All classes must be present in each training fold")
-                oof[test, i*c:(i+1)*c] = fitted.predict_proba(x[test])
+                oof[test, i * c : (i + 1) * c] = fitted.predict_proba(x[test])
             self.models_.append(clone(estimator).fit(x, y))
         self.meta_ = LogisticRegression(max_iter=2000, class_weight="balanced").fit(oof, y)
         return self
@@ -109,7 +144,9 @@ class GroupedLateFusion:
         check_is_fitted(self, "meta_")
         if len(views) != len(self.models_):
             raise ValueError("Wrong number of views")
-        return self.meta_.predict_proba(np.column_stack([m.predict_proba(x) for m, x in zip(self.models_, views)]))
+        return self.meta_.predict_proba(
+            np.column_stack([m.predict_proba(x) for m, x in zip(self.models_, views, strict=True)])
+        )
 
     def predict(self, views):
         return self.classes_[self.predict_proba(views).argmax(axis=1)]

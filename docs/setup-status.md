@@ -2,16 +2,10 @@
 
 Date: 16 October 2026 (Asia/Singapore).
 
-## Desktop location
+## Location
 
-The complete project was moved to `C:\Users\Lenovo\Desktop\Leafy AI` at the user's
-request. The original generated output folder no longer contains a second copy.
-Git history, the Python environment and all three model checkpoints moved with it.
-The editable package, activation scripts and console launchers were repaired for
-the new path. Python imports now resolve to the Desktop source directory.
-
-No Codex/ChatGPT sidebar project has been created; this is the actual local Git
-project directory. The current chat remains attached to its original workspace.
+Original setup ran in a local Windows checkout. Paths in this repository are
+relative to repository root; see README for platform neutral install.
 
 ## GitHub
 
@@ -25,7 +19,7 @@ session provides the alternative publication route requested by the user.
 The web upload publishes the tracked source snapshot with its directory layout.
 Large dataset archives, downloaded model weights and `.venv` are excluded; the
 repository contains pinned download scripts, manifests and verification records.
-Original local setup history is retained in the Desktop Git repository. A web
+Original local setup history is retained in the original local Git repository. A web
 upload creates its own GitHub commit rather than transferring those local commits.
 No credentials are stored in source files.
 
@@ -35,7 +29,7 @@ verified account's standard GitHub noreply identity.
 
 ## Installed and validated
 
-- Python 3.12 CPU environment in `.venv`; dependencies in `requirements-lock.txt`.
+- Python 3.12 CPU environment on Windows; dependencies in `requirements-lock.txt`.
 - Three official ImageNet checkpoints in ignored `models/weights`; exact sources,
   versions and hashes in `models/manifest.json`.
 - Six original integrity tests plus three dataset tests: 9 passed.

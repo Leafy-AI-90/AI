@@ -1,0 +1,25 @@
+name: Bug report
+description: Code fails, crashes or gives wrong output
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Command run, full error and expected result
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: OS, Python version, git commit
+    validations:
+      required: true
+  - type: checkboxes
+    id: data
+    attributes:
+      label: Data safety
+      options:
+        - label: I did not attach raw plant data, images or personal information
+          required: true

@@ -1,5 +1,7 @@
 """Calibrated optical features. Inputs must follow the explicit wavelength order."""
+
 import numpy as np
+
 from . import BANDS
 
 
@@ -37,16 +39,21 @@ def spectral_features(r, a):
     if np.any(r < 0):
         raise ValueError("Negative calibrated reflectance requires measurement QC")
     band = {b: r[:, i] for i, b in enumerate(BANDS)}
+
     def divide(x, y):
         if np.any(np.abs(y) <= 1e-12):
             raise ValueError("Spectral index denominator is zero")
         return x / y
+
     def nd(x, y):
         return divide(band[x] - band[y], band[x] + band[y])
-    indices = np.column_stack((nd(810, 680), nd(760, 705),
-        divide(band[760], band[705]) - 1, nd(810, 560), nd(535, 560)))
-    return np.column_stack((r, np.diff(r) / np.diff(BANDS), indices, a,
-                            a[:, 0] - a[:, 2], a[:, 1] - a[:, 2]))
+
+    indices = np.column_stack(
+        (nd(810, 680), nd(760, 705), divide(band[760], band[705]) - 1, nd(810, 560), nd(535, 560))
+    )
+    return np.column_stack(
+        (r, np.diff(r) / np.diff(BANDS), indices, a, a[:, 0] - a[:, 2], a[:, 1] - a[:, 2])
+    )
 
 
 def positional_features(m710):

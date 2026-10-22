@@ -1,8 +1,9 @@
 import numpy as np
 import pytest
-from leafy_ai.features import reflectance, absorbance, spectral_features, positional_features
-from leafy_ai.validation import grouped_folds, cycle_folds
+
+from leafy_ai.features import absorbance, positional_features, reflectance, spectral_features
 from leafy_ai.models import intermediate_fusion, spectral_model
+from leafy_ai.validation import cycle_folds, grouped_folds
 
 
 def test_repeated_observations_never_cross_folds():
@@ -44,10 +45,10 @@ def test_calibration_and_positional_signs():
 
 
 def test_normalization_is_fit_on_train_only():
-    train = np.array([[0., 1.], [1., 2.], [2., 3.], [3., 4.]])
+    train = np.array([[0.0, 1.0], [1.0, 2.0], [2.0, 3.0], [3.0, 4.0]])
     model = spectral_model("logistic").fit(train, [0, 0, 1, 1])
     original = model[0].mean_.copy()
-    model.predict([[999., 999.]])
+    model.predict([[999.0, 999.0]])
     np.testing.assert_array_equal(model[0].mean_, original)
     np.testing.assert_allclose(original, train.mean(axis=0))
 
@@ -58,6 +59,6 @@ def test_fusion_pca_sees_only_training_rows():
     model = intermediate_fusion(8, 12, pca_components=3).fit(train, np.tile([0, 1, 2], 10))
     transformer = model[0].named_transformers_["image"]
     mean = transformer[0].mean_.copy()
-    model.predict(np.full((2, 12), 1000.))
+    model.predict(np.full((2, 12), 1000.0))
     np.testing.assert_allclose(mean, train[:, :8].mean(0))
     np.testing.assert_array_equal(transformer[0].mean_, mean)
