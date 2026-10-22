@@ -87,6 +87,15 @@ class QC(_Frozen):
         return self
 
 
+class Calibration(_Frozen):
+    """Pre-specified H1 extraction protocol and grouped cross-validation budget."""
+
+    solvent: Literal["acetone_80", "ethanol_95"] = "acetone_80"
+    outer_folds: int = Field(default=5, ge=2)
+    inner_folds: int = Field(default=3, ge=2)
+    max_pls_components: int = Field(default=12, ge=1)
+
+
 class StudyConfig(_Frozen):
     """One study design. Every field is explicit in the preset YAML."""
 
@@ -103,6 +112,7 @@ class StudyConfig(_Frozen):
     sensors: Sensors = Sensors()
     key_confusion_pairs: tuple[tuple[str, str], ...] = ()
     qc: QC = QC()
+    calibration: Calibration = Calibration()
 
     @model_validator(mode="after")
     def _check(self) -> StudyConfig:
