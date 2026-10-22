@@ -1,6 +1,7 @@
 """Plant-level split construction, with repeated observations kept together."""
+
 import numpy as np
-from sklearn.model_selection import StratifiedKFold, LeaveOneGroupOut
+from sklearn.model_selection import LeaveOneGroupOut, StratifiedKFold
 
 
 def grouped_folds(y, plants, n_splits=5, seed=42):
@@ -19,7 +20,10 @@ def grouped_folds(y, plants, n_splits=5, seed=42):
         raise ValueError("Too few independent plants per class for requested folds")
     cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed)
     for train, test in cv.split(unique, labels):
-        yield np.flatnonzero(np.isin(plants, unique[train])), np.flatnonzero(np.isin(plants, unique[test]))
+        yield (
+            np.flatnonzero(np.isin(plants, unique[train])),
+            np.flatnonzero(np.isin(plants, unique[test])),
+        )
 
 
 def cycle_folds(plants, cycles):

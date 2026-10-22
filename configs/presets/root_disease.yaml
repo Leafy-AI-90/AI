@@ -1,0 +1,23 @@
+# Likely main design; leaf positions and endpoint pending confirmation with TLL mentor.
+schema_version: 1
+preset: root_disease
+description: N deficiency, water stress, root disease and N deficiency + root disease in Choy Sum
+crop: choy_sum
+classes: [control, n_deficiency, water_stress, root_disease, n_deficiency_root_disease]
+design:
+  plants_per_class: 24
+  cycles: 3
+  calibration_plants: 60
+  days: {first: -1, last: 14}
+  endpoint_day: 10
+leaf_positions: [oldest, middle, youngest]
+repeats: 3
+spectral:
+  sensor: AS7265x
+  bands_nm: [410, 435, 460, 485, 510, 535, 560, 585, 610, 645, 680, 705, 730, 760, 810, 860, 900, 940]
+transmission:
+  leds_nm: [660, 710, 940, 970]
+sensors: {rgb: true, spectral: true, transmission: true, thermal: true, root_images: true}
+key_confusion_pairs:
+  - [n_deficiency, root_disease]
+  - [root_disease, water_stress]

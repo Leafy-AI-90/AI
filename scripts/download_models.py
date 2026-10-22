@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from leafy_ai.vision import download_weights
 
 if __name__ == "__main__":

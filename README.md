@@ -1,11 +1,10 @@
-# AI
+# Leafy AI
 
-## Leafy AI
+[![CI](https://github.com/Leafy-AI-90/AI/actions/workflows/ci.yml/badge.svg)](https://github.com/Leafy-AI-90/AI/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Open-source model foundations for paired RGB images, 18-band AS7265x reflectance,
 and 660/710/940 nm transmission measurements of Choy Sum.
-
-Local project: `C:\Users\Lenovo\Desktop\Leafy AI`.
 
 PlantVillage and PlantDoc are downloaded locally and ready for image-model
 experiments. See [dataset setup and training usage](docs/datasets.md). Their
@@ -33,31 +32,61 @@ The document does not identify a specific B4 checkpoint. ImageNet weights are
 not a substitute for PlantVillage-trained weights. No unverified third-party
 diagnostic checkpoint is installed.
 
-### Run locally
+### Install
 
-Python 3.11-3.13 is supported; this checkout was installed with Python 3.12 on
-Windows using CPU PyTorch. From this directory in PowerShell:
+Python 3.11 to 3.13 on Linux, macOS or Windows. Install CPU PyTorch first to
+avoid multi GB CUDA wheels (skip on macOS, where default wheels are CPU/MPS).
 
-```powershell
-# The local .venv is already installed in this checkout.
-.\.venv\Scripts\python.exe scripts/download_models.py
-.\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe scripts/smoke_test.py
+With `uv`:
+
+```bash
+uv venv --python 3.12
+uv pip install --index-url https://download.pytorch.org/whl/cpu torch==2.9.1 torchvision==0.24.1
+uv pip install -e ".[vision,stats,dev]"
 ```
 
-To recreate on a new Windows machine with Python 3.12:
+With `pip`:
 
-```powershell
+```bash
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.9.1 torchvision==0.24.1
-.\.venv\Scripts\python.exe -m pip install --find-links vendor/wheels -r requirements-lock.txt
-.\.venv\Scripts\python.exe -m pip install --no-deps -e .
-.\.venv\Scripts\python.exe scripts/download_models.py
+# activate: source .venv/bin/activate (Linux/macOS) or .venv\Scripts\activate (Windows)
+python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.9.1 torchvision==0.24.1
+python -m pip install -e ".[vision,stats,dev]"
 ```
 
-On Linux/macOS, use `.venv/bin/python`. The lock records this Windows CPU
-environment; use `pip install --find-links vendor/wheels -e '.[dev]'` after installing the appropriate
-PyTorch build for other platforms. GPU training is optional and not installed here.
+| Extra | Contents |
+|---|---|
+| core | numpy, scipy, scikit-learn, XGBoost, pandas, pydantic, PyYAML |
+| `[vision]` | PyTorch, torchvision, timm, Pillow, Grad-CAM |
+| `[stats]` | statsmodels, SHAP, matplotlib |
+| `[export]` | phone export tools (Phase 9) |
+| `[dev]` | pytest, pytest-cov, ruff, pre-commit |
+| `[all]` | everything above |
+
+Use editable install (`-e`): study presets load from `configs/` in repository.
+`requirements-lock.txt` records original Windows Python 3.12 CPU environment;
+`vendor/wheels` holds optional Grad-CAM wheel (`--find-links vendor/wheels`).
+
+### Run checks
+
+```bash
+python scripts/download_models.py          # verified ImageNet weights, about 160 MB
+python -m pytest -q
+python scripts/smoke_test.py               # or --skip-checkpoints without weights
+```
+
+### Study presets
+
+Study design lives in YAML, not code. See [configs/README.md](configs/README.md).
+
+```python
+from leafy_ai.config import load_config
+
+cfg = load_config("root_disease")   # or "xcc" (default), "salt_planb", or a YAML path
+cfg.classes, cfg.leaf_positions, cfg.design.endpoint_day, cfg.sensors.thermal
+```
+
+`leafy_ai.CLASSES` keeps returning default `xcc` class list for backward compatibility.
 
 ### Use the models
 
@@ -86,8 +115,9 @@ loads only local verified checkpoints with `weights_only=True`.
 
 ### Research boundaries
 
-- Default classes: control, N deficiency, Fe deficiency, Xcc, N deficiency + Xcc.
-- The proposal's primary endpoint is plant-level day-8 macro F1 on held-out cycles.
+- Default preset `xcc`: control, N deficiency, Fe deficiency, Xcc, N deficiency + Xcc.
+- Primary endpoint: plant-level macro F1 on held-out cycles at preset `endpoint_day`
+  (day 8 for `xcc`, day 10 for `root_disease`).
 - Keep all days, leaves, repeats, and images of a plant together. Use globally
   unique IDs, including cycle where local plant numbers are reused.
 - `grouped_folds` and `cycle_folds` enforce the core split boundaries. They do not
@@ -100,4 +130,9 @@ See [design mapping](docs/design.md), [model sources and licenses](docs/models.m
 [verification](docs/verification.json), [data checks](docs/data-verification.json),
 and [setup status](docs/setup-status.md).
 
-Remote: https://github.com/Leafy-AI-90/AI.git
+### Licence
+
+Code: MIT ([LICENSE](LICENSE)). Datasets (PlantVillage, PlantDoc and others) and
+pretrained weights (ImageNet checkpoints) keep upstream licences and terms; MIT
+does not relicense them. See [datasets](docs/datasets.md) and [models](docs/models.md).
+Cite this software with [CITATION.cff](CITATION.cff).

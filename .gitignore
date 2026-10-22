@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Raw data, weights and generated outputs stay out of Git
+data/raw/
+data/interim/
+data/processed/
+models/weights/
+runs/
+reports/*
+!reports/templates/
+*.parquet
+*.pth
+*.pt
+*.onnx
+*.tflite
+*.mlpackage/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

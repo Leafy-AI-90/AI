@@ -1,9 +1,5 @@
 # PlantVillage and PlantDoc in Leafy AI
 
-The project lives at `C:\Users\Lenovo\Desktop\Leafy AI`. Its Python environment,
-Git history and downloaded model weights moved with it. Activation scripts,
-console launchers and the editable Python package were repaired for the new path.
-
 ## What is copied, and what belongs in Git?
 
 Keep one local download of each dataset inside the project. Do not copy its
@@ -14,7 +10,7 @@ published to GitHub. Git LFS or DVC can be added later if you need to distribute
 your own versioned dataset, but neither is needed for these upstream downloads.
 
 ```text
-Leafy AI/
+<repository root>/
   data/
     sources.json                 # tracked: pinned upstream revisions and provenance
     dataset-summary.json         # tracked: counts, audit and archive checksums
@@ -45,10 +41,10 @@ contains other image variants too; only color images enter our manifest.
 
 To recreate the data from the pinned sources:
 
-```powershell
-.\.venv\Scripts\python.exe scripts/download_datasets.py
-.\.venv\Scripts\python.exe scripts/prepare_datasets.py
-.\.venv\Scripts\python.exe scripts/check_dataset_batches.py
+```bash
+python scripts/download_datasets.py
+python scripts/prepare_datasets.py
+python scripts/check_dataset_batches.py
 ```
 
 ## How to train with them
@@ -65,7 +61,7 @@ from torch.utils.data import DataLoader
 from leafy_ai.datasets import ArchiveDataset
 from leafy_ai.vision import image_transform, load_backbone
 
-root = '.'  # run from the Leafy AI project directory
+root = '.'  # run from repository root
 train = ArchiveDataset(root, 'plantvillage', 'train', image_transform(training=True))
 valid = ArchiveDataset(root, 'plantvillage', 'validation', image_transform())
 loader = DataLoader(train, batch_size=16, shuffle=True, num_workers=0)
