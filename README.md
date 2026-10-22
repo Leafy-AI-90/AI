@@ -124,6 +124,10 @@ Use the [statistics guide](docs/statistics.md) for H1–H5 tables, paired
 plant-level comparisons, ablations and power planning. The analysis scripts
 produce no biological claim until measured held-out data are supplied.
 
+The [explainability and report guide](docs/explainability.md) covers fold-local
+SHAP, held-out Grad-CAM leaf-mask checks, and a Quarto paper site assembled
+from hashed analysis runs. Generated reports remain outside Git.
+
 `leafy_ai.CLASSES` keeps returning default `xcc` class list for backward compatibility.
 
 ### Use the models
