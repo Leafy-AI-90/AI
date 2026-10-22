@@ -35,7 +35,10 @@ def download_weights(directory, manifest_path):
     """Only official PyTorch URLs; verify publisher's hash prefix and save full hash."""
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
-    manifest = {"status": "Verified upstream pretraining only; no plant-stress training", "models": {}}
+    manifest = {
+        "status": "Verified upstream pretraining only; no plant-stress training",
+        "models": {},
+    }
     for name, (_, weights, dim) in CATALOG.items():
         filename = weights.url.rsplit("/", 1)[1]
         path = directory / filename
