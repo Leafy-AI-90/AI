@@ -37,7 +37,7 @@ or account-management instructions.
 
 ## Data contract for future training
 
-Full table contract: [data-schema.md](data-schema.md). Summary:
+Full table contract: [data-schema.md](data-schema.md). Feature columns: [features.md](features.md). Summary:
 
 Use one analysis row per plant/day after explicitly aggregating measurement
 repeats. Raw readings need plant_id, cycle, day, leaf/position, repeat ID,
