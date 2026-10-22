@@ -43,7 +43,7 @@ jobs:
       - name: Install CPU PyTorch
         run: python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.9.1 torchvision==0.24.1
       - name: Install package
-        run: python -m pip install -e ".[vision,stats,dev]"
+        run: python -m pip install -e ".[vision,image,stats,dev]"
       - name: Unit tests
         run: python -m pytest -q --cov --cov-report=term
       - name: Synthetic smoke test
@@ -64,7 +64,7 @@ jobs:
           path: models/weights
           key: weights-${{ hashFiles('models/manifest.json') }}
       - run: python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.9.1 torchvision==0.24.1
-      - run: python -m pip install -e ".[vision,stats,dev]"
+      - run: python -m pip install -e ".[vision,image,stats,dev]"
       - run: python scripts/download_models.py
       - run: python scripts/smoke_test.py
       - name: Manifest unchanged

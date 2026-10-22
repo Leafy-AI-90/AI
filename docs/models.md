@@ -10,6 +10,10 @@
 | statsmodels | https://github.com/statsmodels/statsmodels | BSD-3-Clause |
 | SHAP | https://github.com/shap/shap | MIT |
 | Grad-CAM | https://github.com/jacobgil/pytorch-grad-cam | MIT |
+| pandera | https://github.com/unionai-oss/pandera | MIT |
+| colour-science (ColorChecker reference data) | https://github.com/colour-science/colour | BSD-3-Clause |
+| colour-checker-detection | https://github.com/colour-science/colour-checker-detection | BSD-3-Clause |
+| OpenCV | https://github.com/opencv/opencv | Apache-2.0 |
 
 Official checkpoint references:
 

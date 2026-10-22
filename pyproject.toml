@@ -24,6 +24,8 @@ dependencies = [
   "pandas>=2.2,<3",
   "pydantic>=2.7,<3",
   "pyyaml>=6,<7",
+  "pandera==0.34.1",
+  "pyarrow>=17",
 ]
 
 [project.optional-dependencies]
@@ -35,11 +37,16 @@ vision = [
   "pillow>=10",
   "grad-cam==1.5.5",
 ]
+image = [
+  "pillow>=10",
+  "colour-science==0.4.7",
+  "colour-checker-detection==0.2.3",  # brings OpenCV and OpenImageIO
+]
 stats = ["statsmodels==0.14.5", "shap==0.49.1", "matplotlib>=3.8"]
 # Phase 9 adds ONNX, TensorFlow Lite and Core ML converters here.
 export = []
 dev = ["pytest>=8,<10", "pytest-cov>=5", "ruff==0.14.3", "pre-commit>=4"]
-all = ["leafy-ai[vision,stats,export,dev]"]
+all = ["leafy-ai[vision,image,stats,export,dev]"]
 
 [project.urls]
 Repository = "https://github.com/Leafy-AI-90/AI"

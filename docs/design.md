@@ -37,6 +37,8 @@ or account-management instructions.
 
 ## Data contract for future training
 
+Full table contract: [data-schema.md](data-schema.md). Summary:
+
 Use one analysis row per plant/day after explicitly aggregating measurement
 repeats. Raw readings need plant_id, cycle, day, leaf/position, repeat ID,
 calibration references, sensor settings and paired image IDs. Labels must come
@@ -47,7 +49,7 @@ Reflectance column order is exported as `leafy_ai.BANDS`; transmission absorbanc
 order is 660, 710, 940 nm. Positional features take repeat-averaged M710 in the order
 oldest leaf, youngest leaf, lesion site, off-lesion site, within the same plant/day.
 
-Future work: real data ingestion, end-to-end fine-tuning, nested hyperparameter
+Future work: end-to-end fine-tuning, nested hyperparameter
 search, class weighting for all estimators, grouped probability calibration,
 cluster bootstrap/statistical comparisons, explainability reports, band-budget
 ablation and external validation. These are not completed or claimed by installation.
