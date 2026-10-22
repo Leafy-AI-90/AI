@@ -1,0 +1,13 @@
+# RFE selects raw sensor bands separately within every plant-level training fold.
+study: root_disease
+name: root_disease_bands_22
+model: logistic
+split: leave_one_cycle_out
+input_file: data/interim/features.parquet
+features:
+  spectral: [r_*, a_660, a_710, a_940, a_970]
+band_budget: 22
+seeds: [17, 29, 43, 59, 71]
+inner_folds: 3
+search_trials: 0
+synthetic: false

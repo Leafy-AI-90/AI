@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import platform
+import re
 import subprocess
 from datetime import UTC, datetime
 from fnmatch import fnmatch
@@ -22,7 +23,11 @@ import pandas as pd
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sklearn.base import clone
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import balanced_accuracy_score, f1_score, recall_score, roc_auc_score
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 from .config import load_config
 from .fusion_training import F3Classifier
@@ -66,6 +71,7 @@ class ExperimentConfig(BaseModel):
     synthetic: bool = False
     image_training: dict[str, Any] = Field(default_factory=dict)
     embedding_manifest: Path | None = None
+    band_budget: int | None = Field(default=None, ge=3, le=22)
 
     @model_validator(mode="after")
     def _check(self) -> ExperimentConfig:
@@ -94,6 +100,12 @@ class ExperimentConfig(BaseModel):
         columns = [column for values in self.features.values() for column in values]
         if len(columns) != len(set(columns)):
             raise ValueError("A feature column cannot appear in more than one modality")
+        if self.band_budget is not None and (
+            self.model not in ("logistic", "pls_da", "random_forest", "xgboost")
+            or set(self.features) != {"spectral"}
+            or self.search_trials != 0
+        ):
+            raise ValueError("Band RFE requires a spectral-only model and fixed search_trials=0")
         return self
 
 
@@ -119,6 +131,11 @@ def _expand_features(cfg: ExperimentConfig, columns: pd.Index) -> ExperimentConf
     all_columns = [column for values in resolved.values() for column in values]
     if len(all_columns) != len(set(all_columns)):
         raise ValueError("A resolved feature appears in multiple modalities")
+    if cfg.band_budget is not None and (
+        len(all_columns) < cfg.band_budget
+        or any(re.fullmatch(r"[ra]_\d{3}", column) is None for column in all_columns)
+    ):
+        raise ValueError("Band budget requires enough raw reflectance/absorbance bands")
     return cfg.model_copy(update={"features": resolved})
 
 
@@ -215,7 +232,17 @@ def _estimator(cfg: ExperimentConfig, seed: int, n_train: int):
             first, total, pca_components=min(32, first, n_train - 1), seed=seed
         )
     name = "logistic" if cfg.model in ("thermal_logistic", "dinov2") else cfg.model
-    return spectral_model(name, seed)
+    base = spectral_model(name, seed)
+    if cfg.band_budget is not None:
+        return make_pipeline(
+            StandardScaler(),
+            RFE(
+                LogisticRegression(max_iter=2000, class_weight="balanced", random_state=seed),
+                n_features_to_select=cfg.band_budget,
+            ),
+            base,
+        )
+    return base
 
 
 def _fit(model, views: list[np.ndarray], labels: np.ndarray, plants: np.ndarray):
@@ -377,7 +404,22 @@ def run_experiment(
                 record[f"p_{c}"] = p[:, i]
             record["predicted"] = classes[p.argmax(axis=1)]
             outcomes.append(record)
-            tuning.append({"seed": seed, "fold": fold, "best_params": params})
+            selected_bands = None
+            if cfg.band_budget is not None:
+                names = next(iter(cfg.features.values()))
+                selected_bands = [
+                    name
+                    for name, keep in zip(names, fitted.named_steps["rfe"].support_, strict=True)
+                    if keep
+                ]
+            tuning.append(
+                {
+                    "seed": seed,
+                    "fold": fold,
+                    "best_params": params,
+                    "selected_bands": selected_bands,
+                }
+            )
             models[f"seed{seed}_fold{fold}"] = fitted
     oof = pd.concat(outcomes, ignore_index=True)
     if cfg.split != "external_test" and oof.groupby(["seed", "plant_id"]).size().ne(1).any():

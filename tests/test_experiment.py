@@ -182,6 +182,42 @@ def test_real_image_features_require_matching_frozen_manifest(tmp_path) -> None:
     assert expanded.features["image"] == ("image_000", "image_001")
 
 
+def test_band_rfe_is_fit_only_on_outer_training_plants(tmp_path, monkeypatch) -> None:
+    data, base = _study(tmp_path)
+    rng = np.random.default_rng(11)
+    band_names = [f"r_{410 + i:03d}" for i in range(18)] + ["a_660", "a_710", "a_940", "a_970"]
+    for name in band_names:
+        data[name] = rng.normal(size=len(data))
+    original = tmp_path / "SYNTH_bands_original.parquet"
+    data.to_parquet(original, index=False)
+    changed = data.copy()
+    changed.loc[changed.cycle == "cycle_0", band_names] += 1000 * rng.normal(
+        size=(sum(changed.cycle == "cycle_0"), len(band_names))
+    )
+    perturbed = tmp_path / "SYNTH_bands_perturbed.parquet"
+    changed.to_parquet(perturbed, index=False)
+    monkeypatch.setattr("leafy_ai.experiment._git_state", lambda: ("test-commit", False))
+    selected = []
+    for path in (original, perturbed):
+        cfg = ExperimentConfig(
+            name=path.stem,
+            model="logistic",
+            split="leave_one_cycle_out",
+            input_file=path,
+            features={"spectral": tuple(band_names)},
+            band_budget=3,
+            seeds=(13,),
+            inner_folds=2,
+            search_trials=0,
+            synthetic=True,
+        )
+        out = run_experiment(cfg, tmp_path / "runs", quick=True)
+        selections = json.loads((out / "run.json").read_text())["tuning"]
+        assert all(len(fold["selected_bands"]) == 3 for fold in selections)
+        selected.append(selections[0]["selected_bands"])
+    assert selected[0] == selected[1]
+
+
 @pytest.mark.parametrize("model", ["f1_late", "f2_intermediate", "f3_cross_attention"])
 def test_fusion_end_to_end_on_synthetic_plants(tmp_path, monkeypatch, model) -> None:
     data, base = _study(tmp_path)

@@ -120,6 +120,10 @@ and a YAML in `configs/experiments/`. The runner writes held-out plant
 probabilities, metrics, tuned parameters, model artifacts and input hashes to
 ignored `runs/` directories. No real-data training run has been made.
 
+Use the [statistics guide](docs/statistics.md) for H1–H5 tables, paired
+plant-level comparisons, ablations and power planning. The analysis scripts
+produce no biological claim until measured held-out data are supplied.
+
 `leafy_ai.CLASSES` keeps returning default `xcc` class list for backward compatibility.
 
 ### Use the models
@@ -155,8 +159,8 @@ loads only local verified checkpoints with `weights_only=True`.
   (day 8 for `xcc`, day 10 for `root_disease`).
 - Keep all days, leaves, repeats, and images of a plant together. Use globally
   unique IDs, including cycle where local plant numbers are reused.
-- `grouped_folds`, `cycle_folds`, and the Phase 5 runner enforce outer and inner
-  split boundaries; Phase 6 adds plant-clustered statistical comparisons.
+- `grouped_folds`, `cycle_folds`, and the experiment runner enforce outer and inner
+  split boundaries; statistics resample or compare whole plants.
 - No dataset images, private source PDF, laboratory protocol, or fabricated
   biological measurement is published by this setup.
 - Synthetic smoke tests demonstrate software operation only.
