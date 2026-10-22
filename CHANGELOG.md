@@ -4,6 +4,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Added (Phase 6: statistics and hypotheses)
+- Plant-level paired inference utilities, H2–H5 hypothesis scripts, paired ablations, corrected repeated CV, random-intercept mixed models, rater agreement and Connor McNemar planning.
+- Fold-local RFE band-budget experiments (3, 6, 12, 18, 22 bands) with selected bands recorded by outer fold.
+- Synthetic-report safeguards, Holm correction, 2,000-replicate plant bootstrap defaults and `docs/statistics.md`.
+
 ### Added (Phase 5: training and evaluation engine)
 - YAML experiment runner with plant- and cycle-held-out evaluation, grouped inner Optuna tuning, external-test isolation, per-plant probability records and run provenance.
 - Fold-local EfficientNet-B0 and MobileNetV3-Large image training, verified frozen DINOv2 ViT-S/14 features, F1/F2/F3 fusion comparison paths, and example configurations.
