@@ -59,6 +59,34 @@ class Sensors(_Frozen):
     root_images: bool = False
 
 
+QC_FLAGS = (
+    "saturated",
+    "negative_counts",
+    "white_drift",
+    "temperature_drift",
+    "repeat_cv",
+    "missing_position",
+    "no_colour_checker",
+)
+
+
+class QC(_Frozen):
+    """Pre-registered QC thresholds. Flagged rows are excluded only for ``exclude_flags``."""
+
+    saturation_count: float = Field(default=65535, gt=0)
+    white_drift_max: float = Field(default=0.02, gt=0)
+    temperature_drift_max_c: float = Field(default=2.0, gt=0)
+    repeat_cv_max: float = Field(default=0.05, gt=0)
+    exclude_flags: tuple[str, ...] = ("saturated", "negative_counts")
+
+    @model_validator(mode="after")
+    def _check(self) -> QC:
+        unknown = set(self.exclude_flags) - set(QC_FLAGS)
+        if unknown:
+            raise ValueError(f"Unknown QC flags {sorted(unknown)}; choose from {QC_FLAGS}")
+        return self
+
+
 class StudyConfig(_Frozen):
     """One study design. Every field is explicit in the preset YAML."""
 
@@ -74,6 +102,7 @@ class StudyConfig(_Frozen):
     transmission: Transmission = Transmission()
     sensors: Sensors = Sensors()
     key_confusion_pairs: tuple[tuple[str, str], ...] = ()
+    qc: QC = QC()
 
     @model_validator(mode="after")
     def _check(self) -> StudyConfig:

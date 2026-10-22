@@ -42,7 +42,7 @@ With `uv`:
 ```bash
 uv venv --python 3.12
 uv pip install --index-url https://download.pytorch.org/whl/cpu torch==2.9.1 torchvision==0.24.1
-uv pip install -e ".[vision,stats,dev]"
+uv pip install -e ".[vision,image,stats,dev]"
 ```
 
 With `pip`:
@@ -51,13 +51,14 @@ With `pip`:
 python -m venv .venv
 # activate: source .venv/bin/activate (Linux/macOS) or .venv\Scripts\activate (Windows)
 python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.9.1 torchvision==0.24.1
-python -m pip install -e ".[vision,stats,dev]"
+python -m pip install -e ".[vision,image,stats,dev]"
 ```
 
 | Extra | Contents |
 |---|---|
-| core | numpy, scipy, scikit-learn, XGBoost, pandas, pydantic, PyYAML |
+| core | numpy, scipy, scikit-learn, XGBoost, pandas, pydantic, PyYAML, pandera, pyarrow |
 | `[vision]` | PyTorch, torchvision, timm, Pillow, Grad-CAM |
+| `[image]` | colour checker detection (colour-science, OpenCV), Pillow |
 | `[stats]` | statsmodels, SHAP, matplotlib |
 | `[export]` | phone export tools (Phase 9) |
 | `[dev]` | pytest, pytest-cov, ruff, pre-commit |
@@ -85,6 +86,21 @@ from leafy_ai.config import load_config
 cfg = load_config("root_disease")   # or "xcc" (default), "salt_planb", or a YAML path
 cfg.classes, cfg.leaf_positions, cfg.design.endpoint_day, cfg.sensors.thermal
 ```
+
+### Ingest real data
+
+Raw exports follow [data schema](docs/data-schema.md): one CSV or Parquet file per table.
+
+```bash
+python scripts/ingest.py --preset xcc --raw data/raw/cycle1 --out data/interim/cycle1
+python scripts/process_images.py --interim data/interim/cycle1 --images-root data/raw/cycle1 --out data/interim/cycle1/images
+```
+
+Ingest validates every table, checks plant and session links, writes read only
+Parquet with SHA-256 manifest, and writes QC report to `reports/qc/cycle1/qc.html`.
+QC flags rows and never drops them; exclusions follow `qc.exclude_flags` in preset.
+Image step fits 3×3 colour correction per image from 24 patch checker and writes
+leaf mask plus background removed variant.
 
 `leafy_ai.CLASSES` keeps returning default `xcc` class list for backward compatibility.
 

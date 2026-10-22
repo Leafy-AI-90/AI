@@ -25,6 +25,11 @@ Validation rules:
 - 3 or 4 unique leaf positions from oldest, youngest, middle, lesion, off_lesion
 - `endpoint_day` after `days.first` and no later than `days.last`
 - Each `key_confusion_pairs` entry names two different configured classes
+- `qc.exclude_flags` only names known QC flags
+
+`qc` block holds pre-registered QC thresholds. Every rule flags rows; only flags
+listed in `qc.exclude_flags` (default `saturated`, `negative_counts`) mark rows as
+excluded. Rows are never dropped. Change rules before data collection, not after.
 
 Root disease and salt leaf positions are placeholders until design is fixed with
 TLL mentor. Change YAML, not code. Experiment YAML files arrive in Phase 5.

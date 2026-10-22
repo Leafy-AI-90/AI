@@ -21,3 +21,9 @@ sensors: {rgb: true, spectral: true, transmission: true, thermal: true, root_ima
 key_confusion_pairs:
   - [n_deficiency, root_disease]
   - [root_disease, water_stress]
+qc:
+  saturation_count: 65535       # AS7265x and ADS1115 16-bit ceiling
+  white_drift_max: 0.02         # relative white tile range within session
+  temperature_drift_max_c: 2.0  # sensor temperature range within session
+  repeat_cv_max: 0.05           # median band CV across repeats at one position
+  exclude_flags: [saturated, negative_counts]
