@@ -96,6 +96,12 @@ python scripts/ingest.py --preset xcc --raw data/raw/cycle1 --out data/interim/c
 python scripts/process_images.py --interim data/interim/cycle1 --images-root data/raw/cycle1 --out data/interim/cycle1/images
 ```
 
+Then build features (one row per plant/day; see [features](docs/features.md)):
+
+```bash
+python scripts/build_features.py --preset xcc --interim data/interim/cycle1
+```
+
 Ingest validates every table, checks plant and session links, writes read only
 Parquet with SHA-256 manifest, and writes QC report to `reports/qc/cycle1/qc.html`.
 QC flags rows and never drops them; exclusions follow `qc.exclude_flags` in preset.
