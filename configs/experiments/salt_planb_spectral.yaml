@@ -1,0 +1,11 @@
+study: salt_planb
+name: salt_planb_spectral_rf
+model: random_forest
+split: leave_one_cycle_out
+input_file: data/interim/features.parquet
+features:
+  spectral: [m660, m710, ci_red_edge, ndvi, r_680, r_705, r_730, a_660, a_710, a_940]
+seeds: [17, 29, 43, 59, 71]
+inner_folds: 3
+search_trials: 8
+synthetic: false

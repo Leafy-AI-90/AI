@@ -1,0 +1,11 @@
+study: root_disease
+name: root_disease_thermal_only
+model: thermal_logistic
+split: leave_one_cycle_out
+input_file: data/interim/features.parquet
+features:
+  thermal: [thermal_dt, thermal_cwsi, thermal_spread, vpd_kpa]
+seeds: [17, 29, 43, 59, 71]
+inner_folds: 3
+search_trials: 8
+synthetic: false

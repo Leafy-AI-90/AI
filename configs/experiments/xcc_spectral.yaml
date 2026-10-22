@@ -1,0 +1,13 @@
+# Supply the real validated feature table before running; this path is ignored by Git.
+study: xcc
+name: xcc_spectral_logistic
+model: logistic
+split: leave_one_cycle_out
+input_file: data/interim/features.parquet
+features:
+  spectral: [m660, m710, ci_red_edge, ndvi, r_680, r_705, r_730, a_660, a_710, a_940]
+seeds: [17, 29, 43, 59, 71]
+outer_folds: 5
+inner_folds: 3
+search_trials: 8
+synthetic: false

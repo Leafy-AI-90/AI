@@ -15,7 +15,15 @@ from leafy_ai.models import (
     intermediate_fusion,
     spectral_model,
 )
-from leafy_ai.vision import CATALOG, GatedCrossAttention, embeddings, image_transform, load_backbone
+from leafy_ai.vision import (
+    CATALOG,
+    GatedCrossAttention,
+    dinov2_transform,
+    embeddings,
+    image_transform,
+    load_backbone,
+    load_dinov2,
+)
 
 
 def main(skip_checkpoints=False):
@@ -55,6 +63,19 @@ def main(skip_checkpoints=False):
             "embedding": list(vector.shape),
         }
         del model
+    if not skip_checkpoints:
+        dino = load_dinov2(root / "models/weights")
+        dino_batch = dinov2_transform()(Image.new("RGB", (518, 518), (60, 130, 45))).unsqueeze(0)
+        with torch.inference_mode():
+            dino_vector = dino(dino_batch)
+        assert dino_vector.shape == (1, 384) and torch.isfinite(dino_vector).all()
+        report["models"]["dinov2_vits14"] = {
+            "checkpoint_forward": "passed",
+            "input": list(dino_batch.shape),
+            "embedding": list(dino_vector.shape),
+            "frozen": all(not parameter.requires_grad for parameter in dino.parameters()),
+        }
+        del dino
     x, y = rng.normal(size=(100, 21)), np.tile(np.arange(5), 20)
     for name in ("logistic", "pls_da", "random_forest", "svm", "mlp", "xgboost"):
         model = spectral_model(name).fit(x, y)
