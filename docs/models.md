@@ -14,6 +14,8 @@
 | colour-science (ColorChecker reference data) | https://github.com/colour-science/colour | BSD-3-Clause |
 | colour-checker-detection | https://github.com/colour-science/colour-checker-detection | BSD-3-Clause |
 | OpenCV | https://github.com/opencv/opencv | Apache-2.0 |
+| DINOv2 ViT-S/14 code and model | https://github.com/facebookresearch/dinov2 | Apache-2.0 model card; official 88,283,115-byte checkpoint pinned by full SHA-256 in `vision.py` |
+| Optuna | https://github.com/optuna/optuna | MIT; inner-fold search only |
 
 Official checkpoint references:
 
@@ -21,6 +23,7 @@ Official checkpoint references:
 - [ConvNeXt-Tiny](https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.convnext_tiny.html), IMAGENET1K_V1.
 - [MobileNetV3-Large](https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.mobilenet_v3_large.html), IMAGENET1K_V2.
 - [PLS regression](https://scikit-learn.org/stable/modules/generated/sklearn.cross_decomposition.PLSRegression.html).
+- [DINOv2 ViT-S/14 model card](https://github.com/facebookresearch/dinov2/blob/main/MODEL_CARD.md) and [official backbone](https://dl.fbaipublicfiles.com/dinov2/dinov2_vits14/dinov2_vits14_pretrain.pth).
 - [XGBoost API](https://xgboost.readthedocs.io/en/stable/python/python_api.html).
 
 The architecture implementations are open source. This project's license does

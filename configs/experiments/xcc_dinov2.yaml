@@ -1,0 +1,12 @@
+study: xcc
+name: xcc_dinov2_frozen
+model: dinov2
+split: leave_one_cycle_out
+input_file: data/interim/features_with_image_embeddings.parquet
+embedding_manifest: data/interim/features_with_image_embeddings.json
+features:
+  image: ["image_*"]
+seeds: [17, 29, 43, 59, 71]
+inner_folds: 3
+search_trials: 8
+synthetic: false

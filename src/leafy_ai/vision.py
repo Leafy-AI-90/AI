@@ -9,6 +9,9 @@ from torch import nn
 from torchvision import models, transforms
 from torchvision.transforms import InterpolationMode
 
+DINOV2_URL = "https://dl.fbaipublicfiles.com/dinov2/dinov2_vits14/dinov2_vits14_pretrain.pth"
+DINOV2_SHA256 = "b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9"
+
 CATALOG = {
     "efficientnet_b0": (models.efficientnet_b0, models.EfficientNet_B0_Weights.IMAGENET1K_V1, 1280),
     "convnext_tiny": (models.convnext_tiny, models.ConvNeXt_Tiny_Weights.IMAGENET1K_V1, 768),
@@ -32,7 +35,10 @@ def download_weights(directory, manifest_path):
     """Only official PyTorch URLs; verify publisher's hash prefix and save full hash."""
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
-    manifest = {"status": "ImageNet initialization only; no plant-stress training", "models": {}}
+    manifest = {
+        "status": "Verified upstream pretraining only; no plant-stress training",
+        "models": {},
+    }
     for name, (_, weights, dim) in CATALOG.items():
         filename = weights.url.rsplit("/", 1)[1]
         path = directory / filename
@@ -54,6 +60,21 @@ def download_weights(directory, manifest_path):
             "pretraining": "ImageNet-1K",
         }
         print(f"Verified {name}: {path.stat().st_size:,} bytes", flush=True)
+    dino_path = directory / DINOV2_URL.rsplit("/", 1)[1]
+    if not dino_path.exists():
+        torch.hub.download_url_to_file(DINOV2_URL, str(dino_path), progress=False)
+    if sha256(dino_path) != DINOV2_SHA256:
+        raise ValueError(f"DINOv2 checkpoint checksum mismatch: {dino_path}")
+    manifest["models"]["dinov2_vits14"] = {
+        "weights": "Meta DINOv2 ViT-S/14 backbone only",
+        "url": DINOV2_URL,
+        "filename": dino_path.name,
+        "sha256": DINOV2_SHA256,
+        "bytes": dino_path.stat().st_size,
+        "embedding_dim": 384,
+        "pretraining": "LVD-142M; Apache-2.0 model card",
+    }
+    print(f"Verified dinov2_vits14: {dino_path.stat().st_size:,} bytes", flush=True)
     Path(manifest_path).parent.mkdir(parents=True, exist_ok=True)
     Path(manifest_path).write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest
@@ -74,6 +95,31 @@ def load_backbone(name, directory, num_classes=None):
         index = {"efficientnet_b0": 1, "convnext_tiny": 2, "mobilenet_v3_large": 3}[name]
         model.classifier[index] = nn.Linear(model.classifier[index].in_features, num_classes)
     return model
+
+
+def load_dinov2(directory):
+    """Frozen official DINOv2 ViT-S/14 from a full-SHA verified local checkpoint."""
+    import timm
+
+    path = Path(directory) / DINOV2_URL.rsplit("/", 1)[1]
+    if not path.is_file():
+        raise FileNotFoundError(f"Run scripts/download_models.py first: {path}")
+    if sha256(path) != DINOV2_SHA256:
+        raise ValueError(f"DINOv2 checkpoint checksum mismatch: {path}")
+    model = timm.create_model("vit_small_patch14_dinov2.lvd142m", pretrained=False)
+    state = torch.load(path, map_location="cpu", weights_only=True)
+    # Official hub model has a mask token absent from timm's inference graph.
+    state.pop("mask_token")
+    model.load_state_dict(state, strict=True)
+    model.eval()
+    for parameter in model.parameters():
+        parameter.requires_grad_(False)
+    return model
+
+
+def dinov2_transform():
+    """Deterministic 518px preprocessing, divisible by the ViT's 14px patch."""
+    return image_transform(training=False, size=518)
 
 
 def embeddings(model, images):

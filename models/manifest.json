@@ -1,5 +1,5 @@
 {
-  "status": "ImageNet initialization only; no plant-stress training",
+  "status": "Verified upstream pretraining only; no plant-stress training",
   "models": {
     "efficientnet_b0": {
       "weights": "EfficientNet_B0_Weights.IMAGENET1K_V1",
@@ -27,6 +27,15 @@
       "bytes": 22132113,
       "embedding_dim": 960,
       "pretraining": "ImageNet-1K"
+    },
+    "dinov2_vits14": {
+      "weights": "Meta DINOv2 ViT-S/14 backbone only",
+      "url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vits14/dinov2_vits14_pretrain.pth",
+      "filename": "dinov2_vits14_pretrain.pth",
+      "sha256": "b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9",
+      "bytes": 88283115,
+      "embedding_dim": 384,
+      "pretraining": "LVD-142M; Apache-2.0 model card"
     }
   }
 }

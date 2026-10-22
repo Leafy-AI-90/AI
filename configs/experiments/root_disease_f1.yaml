@@ -1,0 +1,13 @@
+study: root_disease
+name: root_disease_f1_comparison
+model: f1_late
+split: leave_one_cycle_out
+input_file: data/interim/features_with_image_embeddings.parquet
+embedding_manifest: data/interim/features_with_image_embeddings.json
+features:
+  image: ["image_*"]
+  spectral: [m660, m710, r_680, r_705, a_660, a_710, a_940, a_970]
+seeds: [17, 29, 43, 59, 71]
+inner_folds: 3
+search_trials: 0
+synthetic: false

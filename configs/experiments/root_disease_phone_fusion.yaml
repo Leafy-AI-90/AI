@@ -1,0 +1,18 @@
+# MobileNetV3-Large frozen image branch + the same measured modalities as proposed.
+study: root_disease
+name: root_disease_phone_fusion
+model: phone
+split: leave_one_cycle_out
+input_file: data/interim/features_with_mobile_embeddings.parquet
+embedding_manifest: data/interim/features_with_mobile_embeddings.json
+features:
+  image: ["image_*"]
+  spectral: [m660, m710, r_680, r_705, a_660, a_710, a_940, a_970]
+  positional: [pos_m710_age]
+  water: [w970]
+  thermal: [thermal_dt, thermal_cwsi, thermal_spread, vpd_kpa]
+  temporal: [m660_delta, m660_slope]
+seeds: [17, 29, 43, 59, 71]
+inner_folds: 3
+search_trials: 0
+synthetic: false

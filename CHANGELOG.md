@@ -4,6 +4,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Added (Phase 5: training and evaluation engine)
+- YAML experiment runner with plant- and cycle-held-out evaluation, grouped inner Optuna tuning, external-test isolation, per-plant probability records and run provenance.
+- Fold-local EfficientNet-B0 and MobileNetV3-Large image training, verified frozen DINOv2 ViT-S/14 features, F1/F2/F3 fusion comparison paths, and example configurations.
+- Optional archive pretraining with explicit license gates and a documented restriction on unreviewed PlantVillage-to-Choy-Sum label mapping.
+- `docs/experiments.md` and leakage, missing-value, image-aggregation and synthetic end-to-end tests.
+
 ### Added (Phase 4: chlorophyll calibration)
 - Configurable extraction solvent and plant-grouped nested CV settings for H1.
 - Lichtenthaler–Buschmann 80% acetone and 95% ethanol calculations with measured dilution, volume, path length and leaf area.

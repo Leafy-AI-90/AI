@@ -6,9 +6,9 @@
 Open-source model foundations for paired RGB images, 18-band AS7265x reflectance,
 and 660/710/940 nm transmission measurements of Choy Sum.
 
-PlantVillage and PlantDoc are downloaded locally and ready for image-model
-experiments. See [dataset setup and training usage](docs/datasets.md). Their
-images are excluded from Git; pinned sources and audit summaries are tracked.
+PlantVillage and PlantDoc source manifests are pinned. Download their archives
+locally before image pretraining; images are excluded from Git. See
+[dataset setup and licensing](docs/datasets.md).
 
 **Status:** model installation and research scaffolding. Image backbones have
 ImageNet weights. No model has been trained or validated to diagnose plant stress.
@@ -19,17 +19,19 @@ Real paired measurements and independently established labels are still required
 | Review role | Implementation | State |
 |---|---|---|
 | B0 | M660 threshold | Binary low-chlorophyll comparator; threshold supplied from calibration |
-| B1 | Logistic regression | Trainable, with fold-local scaling |
-| B2 | PLS-DA, random forest, SVM, small MLP | Trainable spectral baselines |
-| B3 | EfficientNet-B0, ConvNeXt-Tiny, MobileNetV3-Large | Official ImageNet checkpoints downloaded locally |
+| B1 | EfficientNet-B0 | Fold-local image fine-tuning runner from verified ImageNet weights |
+| B2 | DINOv2 ViT-S/14 | Official SHA-256-pinned frozen features plus grouped logistic |
+| B3 | PLS-DA, random forest, XGBoost, logistic | Fold-local spectral runner |
+| B4 | Thermal-only logistic | Enabled for root-disease preset |
+| B5 | PlantVillage-trained CNN | Requires licensed pretraining run and reviewed Choy Sum label mapping |
 | Calibration | PLS regression | Trainable chlorophyll regression |
 | F1 | Grouped out-of-fold logistic stacking | Trainable fusion component |
-| F2 / proposed | PCA image embeddings + spectral/positional features + XGBoost | Trainable fusion pipeline |
-| F3 | Gated cross-attention head | Untrained comparison implementation |
-| B4 | PlantVillage-trained CNN | Deferred: requires a documented PlantVillage training run and label mapping |
+| F2 / proposed | Frozen image embeddings + fold-local PCA + measured features + XGBoost | Trainable fusion pipeline |
+| F3 | Gated cross-attention on frozen image vector and measured features | Fold-local comparison runner |
+| Phone | MobileNetV3-Large | Frozen image embeddings with proposed measured modalities; export follows in Phase 9 |
 
-The document does not identify a specific B4 checkpoint. ImageNet weights are
-not a substitute for PlantVillage-trained weights. No unverified third-party
+The document does not identify a specific PlantVillage-trained checkpoint.
+ImageNet weights are not a substitute for one. No unverified third-party
 diagnostic checkpoint is installed.
 
 ### Install
@@ -56,7 +58,7 @@ python -m pip install -e ".[vision,image,stats,dev]"
 
 | Extra | Contents |
 |---|---|
-| core | numpy, scipy, scikit-learn, XGBoost, pandas, pydantic, PyYAML, pandera, pyarrow |
+| core | numpy, scipy, scikit-learn, XGBoost, Optuna, pandas, pydantic, PyYAML, pandera, pyarrow |
 | `[vision]` | PyTorch, torchvision, timm, Pillow, Grad-CAM |
 | `[image]` | colour checker detection (colour-science, OpenCV), Pillow |
 | `[stats]` | statsmodels, SHAP, matplotlib |
@@ -71,7 +73,7 @@ Use editable install (`-e`): study presets load from `configs/` in repository.
 ### Run checks
 
 ```bash
-python scripts/download_models.py          # verified ImageNet weights, about 160 MB
+python scripts/download_models.py          # verified ImageNet and DINOv2 weights, about 250 MB
 python -m pytest -q
 python scripts/smoke_test.py               # or --skip-checkpoints without weights
 ```
@@ -113,6 +115,11 @@ after ingestion and feature building. It selects PLS components in inner
 plant-grouped folds and compares held-out predictions with M660 and red-edge
 baselines. No H1 biological result is reported until real measurements exist.
 
+Run plant-level classification with the [experiment guide](docs/experiments.md)
+and a YAML in `configs/experiments/`. The runner writes held-out plant
+probabilities, metrics, tuned parameters, model artifacts and input hashes to
+ignored `runs/` directories. No real-data training run has been made.
+
 `leafy_ai.CLASSES` keeps returning default `xcc` class list for backward compatibility.
 
 ### Use the models
@@ -137,7 +144,8 @@ probability calibration because its built-in CV is not grouped by plant.
 
 Weights live under `models/weights/` and are excluded from Git. The versioned
 `models/manifest.json` records exact upstream weight enums, URLs, sizes, and full
-SHA-256 hashes. `download_models.py` verifies publisher hash prefixes. Inference
+SHA-256 hashes. `download_models.py` verifies publisher hash prefixes and DINOv2's
+full hash. Inference
 loads only local verified checkpoints with `weights_only=True`.
 
 ### Research boundaries
@@ -147,8 +155,8 @@ loads only local verified checkpoints with `weights_only=True`.
   (day 8 for `xcc`, day 10 for `root_disease`).
 - Keep all days, leaves, repeats, and images of a plant together. Use globally
   unique IDs, including cycle where local plant numbers are reused.
-- `grouped_folds` and `cycle_folds` enforce the core split boundaries. They do not
-  constitute a complete nested model-selection or statistical analysis runner.
+- `grouped_folds`, `cycle_folds`, and the Phase 5 runner enforce outer and inner
+  split boundaries; Phase 6 adds plant-clustered statistical comparisons.
 - No dataset images, private source PDF, laboratory protocol, or fabricated
   biological measurement is published by this setup.
 - Synthetic smoke tests demonstrate software operation only.

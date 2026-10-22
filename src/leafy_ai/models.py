@@ -42,6 +42,52 @@ class PLSDA(ClassifierMixin, BaseEstimator):
         return self.classes_[self.predict_proba(X).argmax(axis=1)]
 
 
+class EncodedXGB(ClassifierMixin, BaseEstimator):
+    """XGBoost with fold-local treatment-label encoding.
+
+    XGBoost 3 requires integer labels 0..K-1. The fitted mapping is saved with
+    each outer-fold model and never inferred from the held-out labels.
+    """
+
+    def __init__(
+        self,
+        n_estimators=100,
+        max_depth=3,
+        learning_rate=0.05,
+        tree_method="hist",
+        n_jobs=2,
+        random_state=42,
+    ):
+        self.n_estimators = n_estimators
+        self.max_depth = max_depth
+        self.learning_rate = learning_rate
+        self.tree_method = tree_method
+        self.n_jobs = n_jobs
+        self.random_state = random_state
+
+    def fit(self, X, y):
+        X, y = check_X_y(X, y)
+        self.classes_, encoded = np.unique(y, return_inverse=True)
+        if len(self.classes_) < 2:
+            raise ValueError("Classification requires at least two classes")
+        self.model_ = XGBClassifier(
+            n_estimators=self.n_estimators,
+            max_depth=self.max_depth,
+            learning_rate=self.learning_rate,
+            tree_method=self.tree_method,
+            n_jobs=self.n_jobs,
+            random_state=self.random_state,
+        ).fit(X, encoded)
+        return self
+
+    def predict_proba(self, X):
+        check_is_fitted(self, "model_")
+        return self.model_.predict_proba(check_array(X))
+
+    def predict(self, X):
+        return self.classes_[self.predict_proba(X).argmax(axis=1)]
+
+
 def spectral_model(name, seed=42):
     models = {
         "logistic": lambda: make_pipeline(
@@ -67,7 +113,7 @@ def spectral_model(name, seed=42):
                 hidden_layer_sizes=(32,), max_iter=1000, early_stopping=False, random_state=seed
             ),
         ),
-        "xgboost": lambda: XGBClassifier(
+        "xgboost": lambda: EncodedXGB(
             n_estimators=100,
             max_depth=3,
             learning_rate=0.05,
@@ -109,7 +155,7 @@ def intermediate_fusion(embedding_dim, total_dim, pca_components=32, seed=42):
     return make_pipeline(transform, spectral_model("xgboost", seed))
 
 
-class GroupedLateFusion:
+class GroupedLateFusion(ClassifierMixin, BaseEstimator):
     """F1: cross-fitted probabilities, then logistic stacking.
 
     Inputs are separate numeric views. Supply estimators with predict_proba.

@@ -40,6 +40,20 @@
         960
       ]
     },
+    "dinov2_vits14": {
+      "checkpoint_forward": "passed",
+      "input": [
+        1,
+        3,
+        518,
+        518
+      ],
+      "embedding": [
+        1,
+        384
+      ],
+      "frozen": true
+    },
     "logistic": "synthetic fit/predict passed",
     "pls_da": "synthetic fit/predict passed",
     "random_forest": "synthetic fit/predict passed",

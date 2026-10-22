@@ -49,7 +49,7 @@ python scripts/check_dataset_batches.py
 
 ## How to train with them
 
-Use PlantVillage for image-backbone pretraining, then optionally fine-tune on
+After the dataset license review described below, use PlantVillage for image-backbone pretraining, then optionally fine-tune on
 PlantDoc's **training** portion for field-image adaptation. Validation is carved
 from each training portion. Keep the test portions out of training and tuning.
 If you train on PlantDoc, do not describe its training images as an unseen

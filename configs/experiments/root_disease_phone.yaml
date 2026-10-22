@@ -1,0 +1,19 @@
+study: root_disease
+name: root_disease_phone_image
+model: phone_image
+split: leave_one_cycle_out
+input_file: data/interim/image_index.parquet
+features: {}
+seeds: [17, 29, 43, 59, 71]
+inner_folds: 3
+search_trials: 0
+image_training:
+  weights_dir: models/weights
+  epochs: 30
+  patience: 5
+  batch_size: 16
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  size: 384
+  device: cpu
+synthetic: false
