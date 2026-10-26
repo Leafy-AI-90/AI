@@ -22,6 +22,7 @@ data/processed/
 models/weights/
 runs/
 reports/*
+!reports/build_report.py
 !reports/templates/
 *.parquet
 *.pth

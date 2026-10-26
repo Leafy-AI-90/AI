@@ -1,0 +1,14 @@
+project:
+  type: website
+  output-dir: _site
+website:
+  title: "Leafy AI research report"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Report
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true

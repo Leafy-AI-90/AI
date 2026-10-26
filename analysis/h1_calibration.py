@@ -154,6 +154,8 @@ def main(argv: list[str] | None = None) -> None:
         "working_tree_dirty": dirty,
         "features_sha256": _sha256(args.features),
         "ground_truth_sha256": _sha256(args.ground_truth),
+        "features_path": str(args.features.resolve()),
+        "ground_truth_path": str(args.ground_truth.resolve()),
         "synthetic": synthetic,
         "day": cfg.design.endpoint_day if args.day is None else args.day,
     }

@@ -97,6 +97,7 @@ def test_cycle_oof_is_one_prediction_per_plant(tmp_path, monkeypatch) -> None:
     oof = pd.read_parquet(out / "oof.parquet")
     assert len(oof) == data.plant_id.nunique()
     assert oof.plant_id.is_unique
+    assert oof.synthetic.all()
     assert set(oof["class"]) == set(data["class"])
     assert np.allclose(oof.filter(regex="^p_").sum(axis=1), 1)
     run = json.loads((out / "run.json").read_text())

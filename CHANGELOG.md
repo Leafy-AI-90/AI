@@ -4,6 +4,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Added (Phase 7: explainability and reports)
+- Held-out permutation SHAP with training-only backgrounds, global/per-class plots and wavelength importance.
+- Grad-CAM image overlays for randomly sampled held-out plants, matched to the saved endpoint image index, and automatic leaf-mask localization audit.
+- Provenance-checked report builder with 300 dpi PNG/SVG figures, rendered CSV tables and a Quarto site template; synthetic outputs remain watermarked.
+- `docs/explainability.md` and focused explainability/report tests.
+
 ### Added (Phase 6: statistics and hypotheses)
 - Plant-level paired inference utilities, H2–H5 hypothesis scripts, paired ablations, corrected repeated CV, random-intercept mixed models, rater agreement and Connor McNemar planning.
 - Fold-local RFE band-budget experiments (3, 6, 12, 18, 22 bands) with selected bands recorded by outer fold.

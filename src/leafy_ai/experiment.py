@@ -397,7 +397,10 @@ def run_experiment(
             if set(model_classes) != set(classes):
                 raise ValueError("Training fold lacks a study class")
             p = p[:, [np.flatnonzero(model_classes == c)[0] for c in classes]]
-            record = test[["plant_id", "cycle", "class", "day"]].copy()
+            record_columns = ["plant_id", "cycle", "class", "day"]
+            if "synthetic" in test:
+                record_columns.append("synthetic")
+            record = test[record_columns].copy()
             record["seed"] = seed
             record["fold"] = fold
             for i, c in enumerate(classes):
@@ -501,7 +504,10 @@ def _run_image_experiment(
             import torch
 
             torch.save(model.cpu().state_dict(), torch_path)
-            record = test.drop_duplicates("plant_id")[["plant_id", "cycle", "class", "day"]]
+            record_columns = ["plant_id", "cycle", "class", "day"]
+            if "synthetic" in test:
+                record_columns.append("synthetic")
+            record = test.drop_duplicates("plant_id")[record_columns]
             record = record.merge(probabilities, on="plant_id", validate="one_to_one")
             record["seed"] = seed
             record["fold"] = fold
