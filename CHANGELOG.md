@@ -6,7 +6,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added (Phase 7: explainability and reports)
 - Held-out permutation SHAP with training-only backgrounds, global/per-class plots and wavelength importance.
-- Grad-CAM image overlays for randomly sampled held-out plants and automatic leaf-mask localization audit.
+- Grad-CAM image overlays for randomly sampled held-out plants, matched to the saved endpoint image index, and automatic leaf-mask localization audit.
 - Provenance-checked report builder with 300 dpi PNG/SVG figures, rendered CSV tables and a Quarto site template; synthetic outputs remain watermarked.
 - `docs/explainability.md` and focused explainability/report tests.
 

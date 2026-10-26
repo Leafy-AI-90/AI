@@ -28,25 +28,30 @@ def _select(oof: pd.DataFrame, per_class: int, seed: int) -> pd.DataFrame:
     return oof.loc[chosen].sort_values(["class", "plant_id"]).reset_index(drop=True)
 
 
-def _image_rows(selected: pd.DataFrame, image_index: pd.DataFrame) -> pd.DataFrame:
-    needed = {"plant_id", "class", "file_path", "mask_path"}
+def _image_rows(
+    selected: pd.DataFrame, image_index: pd.DataFrame, run_images: pd.DataFrame
+) -> pd.DataFrame:
+    needed = {"plant_id", "class", "day", "file_path", "mask_path"}
     if needed - set(image_index):
-        raise ValueError("Image index needs plant_id, class, file_path, mask_path")
-    rows = image_index.loc[image_index.plant_id.isin(selected.plant_id)].copy()
+        raise ValueError("Image index needs plant_id, class, day, file_path, mask_path")
+    keys = ["plant_id", "class", "day", "file_path"]
+    if set(keys) - set(run_images):
+        raise ValueError("Saved experiment image index lacks endpoint image keys")
+    eligible = image_index.merge(
+        run_images[keys].drop_duplicates(), on=keys, how="inner", validate="many_to_one"
+    )
+    rows = selected.merge(
+        eligible, on=["plant_id", "class", "day"], how="inner", validate="one_to_many"
+    )
     if "view" in rows:
         rows = rows.loc[rows["view"] != "root"]
     rows = rows.sort_values(["plant_id", "file_path"]).drop_duplicates("plant_id")
     if set(rows.plant_id) != set(selected.plant_id):
-        raise ValueError("Every selected plant needs a leaf image and mask")
-    combined = selected.merge(rows, on="plant_id", suffixes=("", "_image"), validate="one_to_one")
-    if (combined["class"] != combined["class_image"]).any():
-        raise ValueError("Image metadata and held-out treatment labels disagree")
+        raise ValueError("Every selected plant needs a saved endpoint leaf image and mask")
     for column in ("file_path", "mask_path"):
-        if combined[column].isna().any() or not all(
-            Path(path).is_file() for path in combined[column]
-        ):
+        if rows[column].isna().any() or not all(Path(path).is_file() for path in rows[column]):
             raise FileNotFoundError(f"Missing {column} for selected test plants")
-    return combined
+    return rows
 
 
 def _load_model(run_dir: Path, run: dict, fold: int, seed: int, classes: list[str], device: str):
@@ -91,7 +96,9 @@ def main(argv: list[str] | None = None) -> None:
     study = load_config(run["config"]["study"])
     oof, _ = validate_oof(read_table(args.run / "oof.parquet"), args.seed)
     chosen = _select(oof, args.per_class, args.sample_seed)
-    rows = _image_rows(chosen, read_table(args.images))
+    rows = _image_rows(
+        chosen, read_table(args.images), read_table(Path(run["config"]["input_file"]))
+    )
     (args.out / "plants").mkdir(exist_ok=True)
     reports = []
     models = {}

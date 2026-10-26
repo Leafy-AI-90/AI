@@ -24,7 +24,8 @@ data/interim/images_explain.parquet --seed 17`. The image index needs one or
 more leaf images per plant, `file_path`, `mask_path`, `class`, and `plant_id`.
 Processed image masks from `scripts/process_images.py` can be joined to the
 original image index by `image_id`. The script selects one leaf image per
-randomly sampled held-out plant (up to 20 per class), loads that plant's outer
+randomly sampled held-out plant (up to 20 per class) from the exact endpoint
+image index saved with the run, loads that plant's outer
 fold image checkpoint, and measures the fraction of Grad-CAM intensity inside
 the leaf mask. It saves individual overlays and a per-class localization
 table. This is a spatial audit, not an explanation of treatment causality.

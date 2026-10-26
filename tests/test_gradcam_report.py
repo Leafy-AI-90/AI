@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
 import torch
 from PIL import Image
 from torch import nn
@@ -53,6 +54,7 @@ def test_gradcam_report_samples_unique_plants_and_measures_leaf_fraction(
             {
                 "plant_id": f"p{i}",
                 "class": name,
+                "day": 8,
                 "view": "leaf close up",
                 "file_path": str(image),
                 "mask_path": str(mask),
@@ -115,3 +117,6 @@ def test_gradcam_report_samples_unique_plants_and_measures_leaf_fraction(
     assert len(table) == 5 and table.plant_id.is_unique
     assert np.allclose(table.attention_inside_leaf, 0.5)
     assert len(list((out / "plants").glob("*.svg"))) == 5
+    wrong_day = pd.DataFrame(image_rows).assign(day=9)
+    with pytest.raises(ValueError, match="saved endpoint"):
+        script._image_rows(pd.DataFrame(oof_rows), wrong_day, pd.DataFrame(image_rows))
